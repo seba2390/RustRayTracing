@@ -250,7 +250,11 @@ fn main() -> std::io::Result<()> {
     // Render
     write!(file, "P3\n{} {}\n255\n", IMAGE_WIDTH, IMAGE_HEIGHT)?;
 
+    // Defining progressbar to visualize progress
+    let bar = indicatif::ProgressBar::new(IMAGE_HEIGHT as u64);
+
     for j in 0..IMAGE_HEIGHT {
+        bar.inc(1);
         for i in 0..IMAGE_WIDTH {
             let float_r = f64::from(i) / f64::from(IMAGE_WIDTH - 1);
             let float_g = f64::from(j) / f64::from(IMAGE_HEIGHT - 1);

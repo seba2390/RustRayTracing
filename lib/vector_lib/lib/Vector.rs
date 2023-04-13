@@ -618,5 +618,15 @@ impl<T: DataTypeTraits> VectorOperations<T> for Vector3D<T> {
     }
 }
 
+// =================================== Special Vector3D impls =================================== //
 
+// Implementing Vector3D<T>.cross_product(Vector3D<T>)
+impl<T: std::ops::Mul<Output = T> + DataTypeTraits> Vector3D<T>{
+    #[inline(always)]
+    fn cross_product(self, other: Self) -> Vector3D<T> {
+        Self { x: self.y * other.z - self.z * other.y,
+               y: self.z * other.x - self.x * other.z,
+               z: self.x * other.y - self.y * other.x}
+    }
+}
 
