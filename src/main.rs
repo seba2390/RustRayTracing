@@ -237,6 +237,7 @@ fn main() -> std::io::Result<()> {
 
      */
 
+    // See: https://en.wikipedia.org/wiki/Netpbm#PPM_example for details regarding .ppm format
     // Image
 
     const IMAGE_WIDTH: i32 = 256;
