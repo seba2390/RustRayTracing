@@ -1,8 +1,9 @@
+use std::io::Write;
 use vector_lib::Vector2D;
 use vector_lib::Vector3D;
 use vector_lib::VectorOperations;
 
-fn main() {
+fn main() -> std::io::Result<()> {
 
     /*
     println!(" ============= 2D VECTOR =================");
@@ -234,9 +235,33 @@ fn main() {
     println!("v2: {}", v2);
     println!("v1 projected onto v2: {}", v1.project(&v2));
 
-
      */
 
+    // Image
 
+    const IMAGE_WIDTH: i32 = 256;
+    const IMAGE_HEIGHT: i32 = 256;
+    
+    // Creating new file
+    let file_name = "test.ppm";
+    let mut file = std::fs::OpenOptions::new().create(true).write(true).open(file_name)?;
 
+    // Render
+    write!(file, "P3\n{} {}\n255\n", IMAGE_WIDTH, IMAGE_HEIGHT)?;
+
+    for j in 0..IMAGE_HEIGHT {
+        for i in 0..IMAGE_WIDTH {
+            let float_r = f64::from(i) / f64::from(IMAGE_WIDTH - 1);
+            let float_g = f64::from(j) / f64::from(IMAGE_HEIGHT - 1);
+            let float_b = 0.25;
+
+            let integer_r = (255.999 * float_r) as i32;
+            let integer_g = (255.999 * float_g) as i32;
+            let integer_b = (255.999 * float_b) as i32;
+
+            writeln!(file, "{} {} {}", integer_r, integer_g, integer_b)?;
+        }
+    }
+
+    Ok(())
 }
