@@ -4,16 +4,16 @@ use vector_lib::Vector2D;
 use vector_lib::Vector3D;
 use vector_lib::VectorOperations;
 use vector_lib::DataTypeTraits;
-type Color<T> = Vector3D<T>;
+use color_lib::RGBColor;
 
 // see: https://raytracing.github.io/books/RayTracingInOneWeekend.html
 
-fn write_color<T: DataTypeTraits>(mut file: &std::fs::File, color: Color<T>) -> std::io::Result<()>
+fn write_color<T: DataTypeTraits>(mut file: &std::fs::File, color: RGBColor<T>) -> std::io::Result<()>
 {
     let factor: f64 = 255.999;
-    let integer_red   = (factor * color.x.to_f64().unwrap()) as i32;
-    let integer_green = (factor * color.y.to_f64().unwrap()) as i32;
-    let integer_blue  = (factor * color.z.to_f64().unwrap()) as i32;
+    let integer_red   = (factor * color.R.to_f64().unwrap()) as i32;
+    let integer_green = (factor * color.G.to_f64().unwrap()) as i32;
+    let integer_blue  = (factor * color.B.to_f64().unwrap()) as i32;
     writeln!(file, "{} {} {}", integer_red, integer_green, integer_blue)?;
     Ok(())
 }
@@ -91,7 +91,7 @@ fn main() -> std::io::Result<()> {
             let ray: Ray3D<f64> = Ray3D{origin: origin.clone(),
                                         direction: &lower_left_corner + &horizontal * u +
                                                    &vertical * v - &origin};
-            let color: Color<f64> = math_lib::ray_color(&ray);
+            let color: RGBColor<f64> = math_lib::ray_color(&ray);
             write_color(&file,color)?;
         }
     }

@@ -18,6 +18,7 @@ indicatif = "0.17.3"
 vector_lib = { path = "lib/vector_lib" }
 math_lib = { path = "lib/math_lib" }
 ray_lib = { path = "lib/ray_lib" }
+color_lib = { path = "lib/color_lib" }
 
 [[bin]]
 name = "main"
