@@ -3,6 +3,7 @@ use vector_lib::{Vector3D, VectorOperations};
 use vector_lib::DataTypeTraits;
 
 // Struct for recording ray collisions
+#[derive(Debug,Copy,Clone)]
 pub struct HitRecord<T: DataTypeTraits> {
     point: Vector3D<T>,
     normal_vector: Vector3D<T>,
@@ -20,7 +21,20 @@ impl<T: DataTypeTraits> HitRecord<T> {
         self.normal_vector = if self.front_face { outwards_normal.clone() } else { outwards_normal.clone() * (-T::one()) };
     }
 }
+////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////// INITIALIZATION IMPL  /////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+// Implementing Vector2D<T> initialization through <T>::new()
+impl<T: DataTypeTraits> Default for HitRecord<T> {
+    fn default() -> Self {
+        HitRecord {point: Vector3D::default(),
+                   normal_vector: Vector3D::default(),
+                   t: T::default(),
+                   front_face: bool::default()}
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////// GETTER & SETTER IMPLS ////////////////////////////////////////
@@ -64,6 +78,8 @@ impl<T: DataTypeTraits> HitRecord<T> {
     }
 }
 
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////// SPECIAL TRAIT FOR OBJECTS //////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -71,5 +87,5 @@ impl<T: DataTypeTraits> HitRecord<T> {
 // TODO: implement this trait for any new shape created in scene ObjectType enum
 pub trait Hittable<T: DataTypeTraits>
 {
-    fn hit(& mut self, ray: &Ray3D<T>, t_min: T, t_max: T) -> bool;
+    fn hit(&mut self, ray: &Ray3D<T>, t_min: T, t_max: T, hit_record: & mut HitRecord<T>) -> bool;
 }

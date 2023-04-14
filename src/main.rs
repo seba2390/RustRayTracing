@@ -8,11 +8,18 @@ use vector_lib::VectorOperations;
 use vector_lib::DataTypeTraits;
 
 use color_lib::RGBColor;
+use scene_lib::Scene;
 use sphere_lib::Sphere;
+
 
 // see: https://raytracing.github.io/books/RayTracingInOneWeekend.html
 
 
+// Constants
+const F32_PI: f32 = std::f32::consts::PI;
+
+
+// Utility functions
 fn write_color<T: DataTypeTraits>(mut file: &std::fs::File, color: RGBColor<T>) -> std::io::Result<()>
 {
     let factor: f64 = 255.999;
@@ -21,6 +28,11 @@ fn write_color<T: DataTypeTraits>(mut file: &std::fs::File, color: RGBColor<T>) 
     let integer_blue  = (factor * color.B.to_f64().unwrap()) as i32;
     writeln!(file, "{} {} {}", integer_red, integer_green, integer_blue)?;
     Ok(())
+}
+
+#[inline(always)]
+fn degrees_to_radians<T: DataTypeTraits>(degrees: T) -> T {
+    degrees * T::from(F32_PI).unwrap() / T::from(180.0).unwrap()
 }
 
 
@@ -168,7 +180,39 @@ fn main() -> std::io::Result<()> {
         }
     }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////// CREATING GRADIENT W. GRADIENT BALL ON GROUND /////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    // Creating ball
+    let sphere: Sphere<f64> = Sphere::new(Vector3D{x:0.0_f64, y:0.0_f64, z: -1.0_f64}, 0.5_f64);
+    // Creating large ball to emulate ground
+    let ground: Sphere<f64> = Sphere::new(Vector3D{x:0.0_f64, y:-100.5_f64, z: -1.0_f64}, 100.0_f64);
+
+    // Creating scene
+    let mut scene = Scene::default();
+    scene.add(Box::new(sphere));
+    scene.add(Box::new(ground));
+
+    // Creating new file
+    let file_name = "gradient_w_gradient_ball_on_ground.ppm";
+    let mut file = std::fs::OpenOptions::new().create(true).write(true).open(file_name)?;
+    // Header info for .ppm file
+    write!(file, "P3\n{} {}\n255\n", IMG_WIDTH, IMG_HEIGHT)?;
+    // Progress bar
+    let bar = indicatif::ProgressBar::new(IMG_HEIGHT as u64);
+    for j in (0..IMG_HEIGHT).rev() {
+        bar.inc(1);
+        for i in 0..IMG_WIDTH {
+            let u = f64::from(i) / f64::from(IMG_WIDTH-1);
+            let v = f64::from(j) / f64::from(IMG_HEIGHT-1);
+
+            let ray: Ray3D<f64> = Ray3D{origin: origin.clone(),
+                direction: &lower_left_corner + &horizontal * u + &vertical * v};
+            let color: RGBColor<f64> = math_lib::ray_color_4(&ray, &mut scene);
+            write_color(&file,color)?;
+        }
+    }
 
     Ok(())
 }

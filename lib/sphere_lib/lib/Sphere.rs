@@ -6,12 +6,11 @@ use vector_lib::DataTypeTraits;
 
 use ray_lib::Ray3D;
 
+#[derive(Clone, Copy)]
 pub struct Sphere<T: DataTypeTraits>
 {
     pub center: Vector3D<T>,
     pub radius: T,
-    // Using Option to avoid having to specify hit_record when initializing
-    hit_record: core::option::Option<HitRecord<T>>
 }
 
 
@@ -20,7 +19,7 @@ impl<T: DataTypeTraits> Sphere<T>
 {
     pub fn new(center: Vector3D<T>, radius: T) -> Self {
         // Doing to this to avoid having to specify hit_record when initializing
-        Sphere {center, radius, hit_record: None}
+        Sphere {center, radius}
     }
 }
 
@@ -61,7 +60,7 @@ impl<T: DataTypeTraits> Sphere<T>
 
 
 impl<T: DataTypeTraits> Hittable<T> for Sphere<T> {
-    fn hit(&mut self, ray: &Ray3D<T>, t_min: T, t_max: T) -> bool
+    fn hit(&mut self, ray: &Ray3D<T>, t_min: T, t_max: T, hit_record: &mut HitRecord<T>) -> bool
     {
         let oc: Vector3D<T> = ray.origin - self.center;
         let a: T = ray.direction.inner_product(&ray.direction);
@@ -82,12 +81,12 @@ impl<T: DataTypeTraits> Hittable<T> for Sphere<T> {
             }
         }
         // Intersection occurred - setting hit record of sphere.
-        self.hit_record.as_mut().expect("Failed to set 't' of hit_record in sphere.").set_t(root);
+        (*hit_record).set_t(root);
         let ray_at = ray.at(root);
-        self.hit_record.as_mut().expect("Failed to set 'point' of hit_record in sphere.").set_point(ray_at);
+        (*hit_record).set_point(ray_at);
         let outwards_normal = (ray_at - &self.center) / self.radius;
-        self.hit_record.as_mut().expect("Failed to set 'normal_vector' of hit_record in sphere.").set_normal_vector(outwards_normal);
-        self.hit_record.as_mut().expect("Failed to set 'face_normal' of hit_record in sphere.").set_face_normal(&ray, &outwards_normal);
+        (*hit_record).set_normal_vector(outwards_normal);
+        (*hit_record).set_face_normal(&ray, &outwards_normal);
         return true;
     }
 }

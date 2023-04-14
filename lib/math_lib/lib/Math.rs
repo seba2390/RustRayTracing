@@ -1,4 +1,4 @@
-use hittable_traits::Hittable;
+use hittable_traits::{HitRecord, Hittable};
 
 use color_lib::RGBColor;
 
@@ -10,7 +10,10 @@ use sphere_lib::Sphere;
 
 use ray_lib::Ray3D;
 
+use scene_lib::Scene;
 
+// Constants
+const F32_INFINITY: f32 = f32::INFINITY;
 
 
 /*
@@ -31,7 +34,8 @@ with 't' going from zero to one.
 pub fn ray_color<T: DataTypeTraits>(ray: &Ray3D<T>) -> RGBColor<T> {
     let unit_direction: Vector3D<T> = ray.direction.unit_vector();
     let t: T = T::from(0.5).unwrap() * (unit_direction.y +  T::one());
-    RGBColor{R: T::one(), G:  T::one(), B:  T::one()} * ( T::one() - t) + RGBColor{R: T::from(0.5).unwrap(), G: T::from(0.7).unwrap(), B:  T::one()} * t
+    return RGBColor{R: T::one(), G:  T::one(), B:  T::one()} * ( T::one() - t) +
+           RGBColor{R: T::from(0.5).unwrap(), G: T::from(0.7).unwrap(), B:  T::one()} * t
 }
 
 
@@ -39,10 +43,10 @@ pub fn ray_color<T: DataTypeTraits>(ray: &Ray3D<T>) -> RGBColor<T> {
 pub fn ray_color_2<T: DataTypeTraits>(ray: &Ray3D<T>, sphere: &Sphere<T>) -> RGBColor<T> {
     if sphere.is_hit(ray)
     {
-        RGBColor{R: T::one(), G: T::zero(), B: T::zero()}
+        return RGBColor{R: T::one(), G: T::zero(), B: T::zero()}
     }
     else {
-        ray_color(ray)
+        return ray_color(ray)
     }
 }
 
@@ -59,4 +63,21 @@ pub fn ray_color_3<T: DataTypeTraits>(ray: &Ray3D<T>, sphere: &Sphere<T>) -> RGB
     else {
         ray_color(ray)
     }
+}
+
+#[inline(always)]
+pub fn ray_color_4<T: DataTypeTraits>(ray: &Ray3D<T>, scene: &mut Scene<T>) -> RGBColor<T> {
+    let mut hit_record = HitRecord::default();
+    if scene.hit(ray, T::zero(), T::from(F32_INFINITY).unwrap(), &mut hit_record) {
+        #[allow(non_snake_case)]
+        let N = hit_record.get_normal_vector();
+        return (RGBColor{R: N.x, G: N.y, B: N.z} + RGBColor{R: T::one(), G: T::one(), B: T::one()})
+                * T::from(0.5).unwrap()
+    }
+    // Unnormalized normal vector of sphere at point of intersection w. ray
+    let unit_direction = ray.direction.unit_vector();
+    let t = T::from(0.5).unwrap() * (unit_direction.y + T::one());
+    return RGBColor{R: T::one(), G:  T::one(), B:  T::one()} * ( T::one() - t) +
+           RGBColor{R: T::from(0.5).unwrap(), G: T::from(0.7).unwrap(), B:  T::one()} * t
+
 }
