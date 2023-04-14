@@ -57,9 +57,7 @@ pub trait VectorOperations<T: DataTypeTraits>: std::clone::Clone
     fn unit_vector(&self) -> Self
         where Self: Sized + std::ops::Div<T, Output=Self>
     {
-        let mut unit_vector = self.clone();
-        unit_vector = unit_vector / self.norm() ;
-        unit_vector
+        self.clone() / self.norm()
     }
 
 
