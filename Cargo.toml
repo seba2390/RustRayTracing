@@ -10,11 +10,14 @@ repository = "https://github.com/seba2390"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-vector_lib = { path = "lib/vector_lib" }
-math_lib = { path = "lib/math_lib" }
+# Official libs
 num-traits = "0.2"
 rand = "0.8.4"
 indicatif = "0.17.3"
+# My libs
+vector_lib = { path = "lib/vector_lib" }
+math_lib = { path = "lib/math_lib" }
+ray_lib = { path = "lib/ray_lib" }
 
 [[bin]]
 name = "main"

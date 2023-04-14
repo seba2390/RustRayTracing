@@ -3,6 +3,8 @@ use vector_lib::Vector2D;
 use vector_lib::Vector3D;
 use vector_lib::VectorOperations;
 
+// see: https://raytracing.github.io/books/RayTracingInOneWeekend.html
+
 fn main() -> std::io::Result<()> {
 
     /*

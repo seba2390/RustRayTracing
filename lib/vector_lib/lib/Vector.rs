@@ -10,7 +10,8 @@ use rand::distributions::{Distribution, Uniform};
 pub trait DataTypeTraits:
         num_traits::Float + std::fmt::Display + std::fmt::Debug +
         std::marker::Copy + std::default::Default + num_traits::Zero +
-        num_traits::One + rand::distributions::uniform::SampleUniform {
+        num_traits::One + rand::distributions::uniform::SampleUniform +
+        std::clone::Clone{
         // we'd usually add more functions in this block,
         // but in this case we don't need any more.
 }
@@ -19,7 +20,8 @@ pub trait DataTypeTraits:
 impl<T> DataTypeTraits for T
     where T: num_traits::Float + std::fmt::Display + std::fmt::Debug +
     std::marker::Copy + std::default::Default + num_traits::Zero +
-    num_traits::One + rand::distributions::uniform::SampleUniform {
+    num_traits::One + rand::distributions::uniform::SampleUniform +
+    std::clone::Clone{
     // Nothing to implement, since T already supports the other traits.
     // It has the functions it needs already
 }
@@ -30,7 +32,7 @@ impl<T> DataTypeTraits for T
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-pub trait VectorOperations<T: DataTypeTraits>:
+pub trait VectorOperations<T: DataTypeTraits>: std::clone::Clone
 {
     // Vector specific (`#[inline]` is ignored on function prototypes)
     fn inner_product(&self, other: &Self) -> T;
@@ -43,15 +45,28 @@ pub trait VectorOperations<T: DataTypeTraits>:
 
     // Generic for all vectors
     #[inline(always)]
-    fn normalize(&mut self) where Self: std::ops::Div<T, Output=Self>, Self: Sized, Self: std::marker::Copy {
+    fn normalize(&mut self)
+        where Self: std::ops::Div<T, Output=Self> + core::marker::Sized + std::marker::Copy
+    {
         let norm = self.norm();
         *self = *self / norm;
     }
 
     // Generic for all vectors
     #[inline(always)]
+    fn unit_vector(&self) -> Self
+        where Self: Sized + std::ops::Div<T, Output=Self>
+    {
+        let mut unit_vector = self.clone();
+        unit_vector = unit_vector / self.norm() ;
+        unit_vector
+    }
+
+
+    // Generic for all vectors
+    #[inline(always)]
     fn project(&self, other: &Self) -> Self
-        where Self: Sized + std::ops::Div<T, Output=Self> + std::ops::Mul<T, Output=Self> + std::marker::Copy{
+        where Self: core::marker::Sized + std::ops::Div<T, Output=Self> + std::ops::Mul<T, Output=Self> + std::marker::Copy{
         let norm = other.norm();
         ((*other) / (norm*norm)) * self.inner_product(other)
     }
@@ -327,7 +342,7 @@ impl<T: std::ops::Div<Output = T> + DataTypeTraits> std::ops::Div<T> for Vector2
     }
 }
 
-// Implementing &Vector2D<T> * T -> Vector2D<T> type multiplication
+// Implementing &Vector2D<T> / T -> Vector2D<T> type multiplication
 impl<'a, T: std::ops::Div<Output = T> + DataTypeTraits> std::ops::Div<T> for &'a Vector2D<T> {
     type Output = Vector2D<T>;
     #[inline(always)]
@@ -404,6 +419,7 @@ impl<T: DataTypeTraits> Vector3D<T>
                    z: T::one()}
     }
 }
+
 
 // Implementing Vector3D<T> with random uniform in [low,high[ initialization through <T>::random_uniform()
 impl<T: DataTypeTraits> Vector3D<T>
@@ -597,7 +613,7 @@ impl<T: std::ops::Div<Output = T> + DataTypeTraits> std::ops::Div<T> for Vector3
     }
 }
 
-// Implementing &Vector3D<T> * T -> Vector3D<T> type multiplication
+// Implementing &Vector3D<T> / T -> Vector3D<T> type multiplication
 impl<'a, T: std::ops::Div<Output = T> + DataTypeTraits> std::ops::Div<T> for &'a Vector3D<T> {
     type Output = Vector3D<T>;
     #[inline(always)]
