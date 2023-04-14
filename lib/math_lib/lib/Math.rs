@@ -1,8 +1,13 @@
+use hittable_traits::Hittable;
+
 use color_lib::RGBColor;
+
 use vector_lib::Vector3D;
 use vector_lib::DataTypeTraits;
 use vector_lib::VectorOperations;
+
 use sphere_lib::Sphere;
+
 use ray_lib::Ray3D;
 
 

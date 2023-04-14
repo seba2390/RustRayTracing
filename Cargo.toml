@@ -20,6 +20,7 @@ math_lib = { path = "lib/math_lib" }
 ray_lib = { path = "lib/ray_lib" }
 color_lib = { path = "lib/color_lib" }
 sphere_lib = { path = "lib/sphere_lib" }
+scene_lib = { path = "lib/scene_lib" }
 
 [[bin]]
 name = "main"

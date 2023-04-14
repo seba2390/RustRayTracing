@@ -146,6 +146,15 @@ impl<T: DataTypeTraits> Vector2D<T>
     }
 }
 
+// Implementing Vector2D<T> initialization through <T>::new()
+impl<T: DataTypeTraits> Default for Vector2D<T> {
+    fn default() -> Self {
+        Vector2D { x: T::default(),
+                   y: T::default() }
+    }
+}
+
+
 // Implementing Vector2D<T> with zeros initialization through <T>::zeros()
 impl<T: DataTypeTraits> Vector2D<T>
 {
@@ -395,6 +404,14 @@ impl<T: DataTypeTraits> Vector3D<T>
         Vector3D {x: T::default(),
                   y: T::default(),
                   z: T::default()}
+    }
+}
+// Implementing Vector3D<T> initialization through <T>::default()
+impl<T: DataTypeTraits> Default for Vector3D<T> {
+    fn default() -> Self {
+        Vector3D { x: T::zero(),
+                   y: T::zero(),
+                   z: T::zero() }
     }
 }
 

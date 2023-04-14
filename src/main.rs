@@ -121,8 +121,7 @@ fn main() -> std::io::Result<()> {
 
     //====== Render ======//
     // Creating ball
-    let sphere: Sphere<f64> = Sphere{center: Vector3D{x:0.0_f64, y:0.0_f64, z: -1.0_f64},
-                                     radius: 0.5_f64 };
+    let sphere: Sphere<f64> = Sphere::new(Vector3D{x:0.0_f64, y:0.0_f64, z: -1.0_f64}, 0.5_f64);
     // Creating new file
     let file_name = "gradient_w_ball.ppm";
     let mut file = std::fs::OpenOptions::new().create(true).write(true).open(file_name)?;

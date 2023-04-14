@@ -1,20 +1,19 @@
 [package]
-name = "math_lib"
+name = "scene_lib"
 version = "0.1.0"
 edition = "2021"
 authors = ["Sebastian Yde Madsen madsen3008@gmail.com"]
-description = "An implementation of math things"
+description = "An implementation 3D scene struct"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/seba2390"
 
 [lib]
-name = "math_lib"
-path = "lib/Math.rs"
+name = "scene_lib"
+path = "lib/Scene.rs"
 
 [dependencies]
 num-traits = "0.2"
+rand = "0.8.4"
 vector_lib = { path = "../vector_lib" }
 ray_lib = { path = "../ray_lib" }
-color_lib = { path = "../color_lib" }
 sphere_lib = { path = "../sphere_lib" }
-hittable_traits = { path = "../hittable_traits" }
