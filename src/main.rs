@@ -1,10 +1,14 @@
 use std::io::Write;
+
 use ray_lib::Ray3D;
+
 use vector_lib::Vector2D;
 use vector_lib::Vector3D;
 use vector_lib::VectorOperations;
 use vector_lib::DataTypeTraits;
+
 use color_lib::RGBColor;
+use sphere_lib::Sphere;
 
 // see: https://raytracing.github.io/books/RayTracingInOneWeekend.html
 
@@ -108,5 +112,39 @@ fn main() -> std::io::Result<()> {
             write_color(&file,color)?;
         }
     }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////// CREATING GRADIENT W. RED BALL ////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+    //====== Render ======//
+    // Creating ball
+    let sphere: Sphere<f64> = Sphere{center: Vector3D{x:0.0_f64, y:0.0_f64, z: -1.0_f64},
+                                     radius: 0.5_f64 };
+    // Creating new file
+    let file_name = "gradient_w_ball.ppm";
+    let mut file = std::fs::OpenOptions::new().create(true).write(true).open(file_name)?;
+    // Header info for .ppm file
+    write!(file, "P3\n{} {}\n255\n", IMG_WIDTH, IMG_HEIGHT)?;
+    // Progress bar
+    let bar = indicatif::ProgressBar::new(IMG_HEIGHT as u64);
+    for j in (0..IMG_HEIGHT).rev() {
+        bar.inc(1);
+        for i in 0..IMG_WIDTH {
+            let u = f64::from(i) / f64::from(IMG_WIDTH-1);
+            let v = f64::from(j) / f64::from(IMG_HEIGHT-1);
+
+            let ray: Ray3D<f64> = Ray3D{origin: origin.clone(),
+                direction: &lower_left_corner + &horizontal * u +
+                    &vertical * v - &origin};
+            let color: RGBColor<f64> = math_lib::ray_color_2(&ray, &sphere);
+            write_color(&file,color)?;
+        }
+    }
+
+
+
     Ok(())
 }
