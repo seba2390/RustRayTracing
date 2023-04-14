@@ -40,3 +40,18 @@ pub fn ray_color_2<T: DataTypeTraits>(ray: &Ray3D<T>, sphere: &Sphere<T>) -> RGB
         ray_color(ray)
     }
 }
+
+#[inline(always)]
+pub fn ray_color_3<T: DataTypeTraits>(ray: &Ray3D<T>, sphere: &Sphere<T>) -> RGBColor<T> {
+    let t = sphere.is_hit_at(ray);
+    if t > T::zero()
+    {
+        // Unnormalized normal vector of sphere at point of intersection w. ray
+        #[allow(non_snake_case)]
+        let N: Vector3D<T> = (ray.at(t)-sphere.center).unit_vector();
+        RGBColor{R: N.x + T::one(), G: N.y + T::one(),B: N.z + T::one()} * T::from(0.5).unwrap()
+    }
+    else {
+        ray_color(ray)
+    }
+}

@@ -25,6 +25,28 @@ impl<T: DataTypeTraits> Sphere<T>
     }
 }
 
+// Notice optimized discriminant calculation as opposed to is_hit
+impl<T: DataTypeTraits> Sphere<T>
+{
+    #[inline(always)]
+    pub fn is_hit_at(&self, ray: &Ray3D<T>) -> T
+    {
+        let oc: Vector3D<T> = ray.origin - self.center;
+        let a: T = ray.direction.inner_product(&ray.direction);
+        let half_b: T = oc.inner_product(&ray.direction);
+        let c = oc.inner_product(&oc) - self.radius*self.radius;
+        let discriminant = half_b*half_b - a*c;
+        if discriminant < T::zero()
+        {
+            -T::one()
+        }
+        else {
+            (-half_b - discriminant.sqrt()) / a
+        }
+    }
+}
+
+
 
 
 

@@ -76,7 +76,7 @@ fn main() -> std::io::Result<()> {
 
     //====== Image ======//
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
-    const IMG_WIDTH: i32 = 600;
+    const IMG_WIDTH: i32 = 1000;
     const IMG_HEIGHT: i32 = (IMG_WIDTH as f64 / ASPECT_RATIO) as i32;
 
     //====== Camera ======//
@@ -140,6 +140,31 @@ fn main() -> std::io::Result<()> {
                 direction: &lower_left_corner + &horizontal * u +
                     &vertical * v - &origin};
             let color: RGBColor<f64> = math_lib::ray_color_2(&ray, &sphere);
+            write_color(&file,color)?;
+        }
+    }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////// CREATING GRADIENT W. GRADIENT BALL //////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // Creating new file
+    let file_name = "gradient_w_gradient_ball.ppm";
+    let mut file = std::fs::OpenOptions::new().create(true).write(true).open(file_name)?;
+    // Header info for .ppm file
+    write!(file, "P3\n{} {}\n255\n", IMG_WIDTH, IMG_HEIGHT)?;
+    // Progress bar
+    let bar = indicatif::ProgressBar::new(IMG_HEIGHT as u64);
+    for j in (0..IMG_HEIGHT).rev() {
+        bar.inc(1);
+        for i in 0..IMG_WIDTH {
+            let u = f64::from(i) / f64::from(IMG_WIDTH-1);
+            let v = f64::from(j) / f64::from(IMG_HEIGHT-1);
+
+            let ray: Ray3D<f64> = Ray3D{origin: origin.clone(),
+                direction: &lower_left_corner + &horizontal * u +
+                    &vertical * v - &origin};
+            let color: RGBColor<f64> = math_lib::ray_color_3(&ray, &sphere);
             write_color(&file,color)?;
         }
     }
