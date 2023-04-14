@@ -8,6 +8,7 @@ use color_lib::RGBColor;
 
 // see: https://raytracing.github.io/books/RayTracingInOneWeekend.html
 
+
 fn write_color<T: DataTypeTraits>(mut file: &std::fs::File, color: RGBColor<T>) -> std::io::Result<()>
 {
     let factor: f64 = 255.999;
