@@ -1,6 +1,8 @@
 use vector_lib::Vector3D;
 use vector_lib::DataTypeTraits;
 
+
+#[derive(PartialEq, Clone, Copy)]
 pub struct Ray3D<T: DataTypeTraits> {
     pub origin: Vector3D<T>,
     pub direction: Vector3D<T>

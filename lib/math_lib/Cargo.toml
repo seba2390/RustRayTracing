@@ -13,4 +13,5 @@ path = "lib/Math.rs"
 
 [dependencies]
 vector_lib = { path = "../vector_lib" }
+ray_lib = { path = "../ray_lib" }
 num-traits = "0.2"
