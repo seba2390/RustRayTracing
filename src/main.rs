@@ -43,7 +43,7 @@ fn convert_to_png(file_name: &str) -> Result<(), String> {
         .arg("-c")
         .arg(&command)
         .output()
-        .map_err(|e| format!("failed to execute process: {}", e))?;
+        .map_err(|e| format!("failed to execute process 1: {}", e))?;
 
     if !output.status.success() {
         return Err(format!("process exited with code {}", output.status));
@@ -53,7 +53,7 @@ fn convert_to_png(file_name: &str) -> Result<(), String> {
         .arg("-c")
         .arg(&command)
         .output()
-        .map_err(|e| format!("failed to execute process: {}", e))?;
+        .map_err(|e| format!("failed to execute process 2: {}", e))?;
 
     if !output.status.success() {
         return Err(format!("process exited with code {}", output.status));

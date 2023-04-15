@@ -1,5 +1,6 @@
-use vec_lib::Vector3D;
-use vec_lib::DataTypeTraits;
+use std::collections::hash_map::VacantEntry;
+use vector_lib::Vector3D;
+use vector_lib::DataTypeTraits;
 
 pub struct Camera<T: DataTypeTraits>
 {
@@ -16,25 +17,18 @@ pub struct Camera<T: DataTypeTraits>
 
 impl<T: DataTypeTraits> Camera<T>
 {
-    pub fn new(aspect_ratio: T, viewport_height: T) -> Self {
-        todo!()
-    }
-}
+    pub fn new(aspect_ratio: T, viewport_height: T, focal_length: T, origin: Vector3D<T>) -> Self {
+        let temp_viewport_height = aspect_ratio * viewport_height;
+        Self{ aspect_ratio: aspect_ratio,
+              viewport_height: viewport_height,
+              viewport_width: temp_viewport_height,
+              focal_length: focal_length,
 
-
-
-// Implementing Vector2D<T> initialization through <T>::new()
-impl<T: DataTypeTraits> Vector2D<T>
-{
-    pub fn new() -> Self {
-        Vector2D {x: T::default(), y: T::default()}
-    }
-}
-
-// Implementing Vector2D<T> initialization through <T>::new()
-impl<T: DataTypeTraits> Default for Vector2D<T> {
-    fn default() -> Self {
-        Vector2D { x: T::default(),
-            y: T::default() }
+              origin: origin,
+              horizontal: Vector3D{x: aspect_ratio * viewport_height, y: T::zero(), z: T::zero()},
+              vertical: Vector3D{x: T::zero(), y: viewport_height, z: T::zero()},
+              lower_left_corner: origin - Vector3D{x: aspect_ratio * viewport_height, y: T::zero(), z: T::zero()} / T::from(2.0).unwrap()
+                     - Vector3D{x: T::zero(), y: viewport_height, z: T::zero()} / T::from(2.0).unwrap()
+                     - Vector3D{x: T::zero(), y: T::zero(), z: focal_length} }
     }
 }
