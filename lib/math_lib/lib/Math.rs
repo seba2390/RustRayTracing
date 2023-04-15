@@ -81,3 +81,54 @@ pub fn ray_color_4<T: DataTypeTraits>(ray: &Ray3D<T>, scene: &mut Scene<T>) -> R
            RGBColor{R: T::from(0.5).unwrap(), G: T::from(0.7).unwrap(), B:  T::one()} * t
 
 }
+
+
+
+/// Generates a random number of type `T` within the given range. If no range is specified, the random number
+/// will be generated within the maximum value of type `T`. The function returns a random number of type `T`.
+///
+/// # Arguments
+///
+/// * `min_value`: An optional parameter of type `Option<T>`. If specified, represents the minimum value of the range.
+/// * `max_value`: An optional parameter of type `Option<T>`. If specified, represents the maximum value of the range.
+///
+/// # Panics
+///
+/// The function will panic if `T` is not of type `f32` or `f64`.
+///
+/// # Examples
+///
+/// Generating a random float between 0.0 and 1.0:
+///
+/// ```
+/// let rand_num = generate_random_number::<f32>(Some(0.0), Some(1.0));
+/// ```
+///
+/// Generating a random float with no specified range (random float within maximum value of `f64`):
+///
+/// ```
+/// let rand_num = generate_random_number::<f64>(None, None);
+/// ```
+#[inline(always)]
+fn generate_random_number<T: DataTypeTraits>(min_value: Option<T>, max_value: Option<T>) -> T {
+    let mut rng = fastrand::Rng::new();
+    if std::mem::size_of::<T>() == std::mem::size_of::<f32>() {
+        let random_float = T::from(rng.f32()).unwrap();
+        match (min_value, max_value) {
+            (Some(min), Some(max)) => return min + random_float * (max - min),
+            (Some(min), None) => return min + random_float * (T::max_value() - min),
+            (None, Some(max)) => return random_float * max,
+            (None, None) => return random_float * T::max_value(),
+        }
+    }
+    if std::mem::size_of::<T>() == std::mem::size_of::<f64>() {
+        let random_float = T::from(rng.f64()).unwrap();
+        match (min_value, max_value) {
+            (Some(min), Some(max)) => return min + random_float * (max - min),
+            (Some(min), None) => return min + random_float * (T::max_value() - min),
+            (None, Some(max)) => return random_float * max,
+            (None, None) => return random_float * T::max_value(),
+        }
+    }
+    panic!("Invalid 'T' type - expected f32 or f64.");
+}
