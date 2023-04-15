@@ -36,6 +36,33 @@ fn degrees_to_radians<T: DataTypeTraits>(degrees: T) -> T {
 }
 
 
+fn convert_to_png(file_name: &str) -> Result<(), String> {
+    let output_file_name = format!("{}.png", &file_name[..file_name.len() - 4]);
+    let command = format!("pnmtopng {} > {}", file_name, output_file_name);
+    let output = std::process::Command::new("sh")
+        .arg("-c")
+        .arg(&command)
+        .output()
+        .map_err(|e| format!("failed to execute process: {}", e))?;
+
+    if !output.status.success() {
+        return Err(format!("process exited with code {}", output.status));
+    }
+    let command = format!("rm {}", file_name);
+    let output = std::process::Command::new("sh")
+        .arg("-c")
+        .arg(&command)
+        .output()
+        .map_err(|e| format!("failed to execute process: {}", e))?;
+
+    if !output.status.success() {
+        return Err(format!("process exited with code {}", output.status));
+    }
+
+    Ok(())
+}
+
+
 
 fn main() -> std::io::Result<()> {
 
@@ -124,6 +151,10 @@ fn main() -> std::io::Result<()> {
             write_color(&file,color)?;
         }
     }
+    match convert_to_png(file_name) {
+        Ok(_) => println!("Conversion successful!"),
+        Err(e) => eprintln!("Error: {}", e),
+    }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// CREATING GRADIENT W. RED BALL ////////////////////////////////////
@@ -154,6 +185,10 @@ fn main() -> std::io::Result<()> {
             write_color(&file,color)?;
         }
     }
+    match convert_to_png(file_name) {
+        Ok(_) => println!("Conversion successful!"),
+        Err(e) => eprintln!("Error: {}", e),
+    }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////// CREATING GRADIENT W. GRADIENT BALL //////////////////////////////////
@@ -178,6 +213,10 @@ fn main() -> std::io::Result<()> {
             let color: RGBColor<f64> = math_lib::ray_color_3(&ray, &sphere);
             write_color(&file,color)?;
         }
+    }
+    match convert_to_png(file_name) {
+        Ok(_) => println!("Conversion successful!"),
+        Err(e) => eprintln!("Error: {}", e),
     }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -212,6 +251,10 @@ fn main() -> std::io::Result<()> {
             let color: RGBColor<f64> = math_lib::ray_color_4(&ray, &mut scene);
             write_color(&file,color)?;
         }
+    }
+    match convert_to_png(file_name) {
+        Ok(_) => println!("Conversion successful!"),
+        Err(e) => eprintln!("Error: {}", e),
     }
 
     Ok(())

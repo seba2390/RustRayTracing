@@ -660,4 +660,3 @@ impl<T: std::ops::Mul<Output = T> + DataTypeTraits> Vector3D<T>{
                z: self.x * other.y - self.y * other.x}
     }
 }
-
