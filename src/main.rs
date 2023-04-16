@@ -251,15 +251,18 @@ fn main() -> std::io::Result<()> {
             let mut color: RGBColor<f64> = RGBColor{R: 0.0_f64, G: 0.0_f64, B: 0.0_f64};
             for sample in 0..SAMPLES_PER_PIXEL_2
             {
-                let u: f64 = (f64::from(i) + utilities_lib::generate_random_number::<f64>(None,None))/ f64::from(IMG_WIDTH-1);
-                let v: f64 = (f64::from(j) + utilities_lib::generate_random_number::<f64>(None,None))/ f64::from(IMG_HEIGHT-1);
+                let u: f64 = (f64::from(i) + utilities_lib::generate_random_number::<f64>(Some(0.0), Some(1.0)))/ f64::from(IMG_WIDTH-1);
+                let v: f64 = (f64::from(j) + utilities_lib::generate_random_number::<f64>(Some(0.0), Some(1.0)))/ f64::from(IMG_HEIGHT-1);
                 let ray: Ray3D<f64> = camera.get_ray(u,v);
                 color = color + utilities_lib::ray_color_4(&ray, &mut scene);
             }
             utilities_lib::write_color(&file,color)?;
         }
     }
-
+    match utilities_lib::convert_to_png(file_name) {
+        Ok(_) => println!("Conversion successful!"),
+        Err(e) => eprintln!("Error: {}", e),
+    }
 
     Ok(())
 }
