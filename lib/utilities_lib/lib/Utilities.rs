@@ -138,13 +138,22 @@ pub fn generate_random_number<T: DataTypeTraits>(min_value: Option<T>, max_value
 }
 
 
-// Utility functions
 pub fn write_color<T: DataTypeTraits>(mut file: &std::fs::File, color: RGBColor<T>) -> std::io::Result<()>
 {
     let factor: f64 = 255.999;
     let integer_red   = (factor * color.R.to_f64().unwrap()) as i32;
     let integer_green = (factor * color.G.to_f64().unwrap()) as i32;
     let integer_blue  = (factor * color.B.to_f64().unwrap()) as i32;
+    writeln!(file, "{} {} {}", integer_red, integer_green, integer_blue)?;
+    Ok(())
+}
+
+pub fn write_color_2<T: DataTypeTraits>(mut file: &std::fs::File, color: RGBColor<T>, samples_per_pixel: u32) -> std::io::Result<()>
+{
+    let factor: f64 = 256.0;
+    let integer_red   = (factor * clamp(color.R.to_f64().unwrap() / samples_per_pixel as f64,0.0, 0.999)) as i32;
+    let integer_green = (factor * clamp(color.G.to_f64().unwrap() / samples_per_pixel as f64,0.0, 0.999)) as i32;
+    let integer_blue  = (factor * clamp(color.B.to_f64().unwrap() / samples_per_pixel as f64,0.0, 0.999)) as i32;
     writeln!(file, "{} {} {}", integer_red, integer_green, integer_blue)?;
     Ok(())
 }
@@ -180,3 +189,10 @@ pub fn convert_to_png(file_name: &str) -> Result<(), String> {
 
     Ok(())
 }
+
+#[inline(always)]
+pub fn clamp<T: DataTypeTraits>(x: T, min: T, max: T) -> T
+{
+    if x < min { min} else if x > max { max} else { x }
+}
+

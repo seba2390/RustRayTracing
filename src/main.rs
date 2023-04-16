@@ -1,4 +1,5 @@
 use std::io::Write;
+use camera_lib::Camera;
 
 use ray_lib::Ray3D;
 
@@ -10,6 +11,7 @@ use vector_lib::DataTypeTraits;
 use color_lib::RGBColor;
 use scene_lib::Scene;
 use sphere_lib::Sphere;
+use utilities_lib::ray_color;
 
 
 // see: https://raytracing.github.io/books/RayTracingInOneWeekend.html
@@ -67,7 +69,7 @@ fn main() -> std::io::Result<()> {
 
     //====== Image ======//
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
-    const IMG_WIDTH: i32 = 1000;
+    const IMG_WIDTH: i32 = 600;
     const IMG_HEIGHT: i32 = (IMG_WIDTH as f64 / ASPECT_RATIO) as i32;
 
     //====== Camera ======//
@@ -208,6 +210,56 @@ fn main() -> std::io::Result<()> {
         Ok(_) => println!("Conversion successful!"),
         Err(e) => eprintln!("Error: {}", e),
     }
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////// ANTI-ALIASING GRADIENT W. GRADIENT BALL ON GROUND //////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // Defining camera for scene
+    const ORIGIN_2: Vector3D<f64> = Vector3D{ x: 0.0_f64, y: 0.0_f64, z: 0.0_f64};
+    const VIEWPORT_HEIGHT_2: f64 = 2.0;
+    const FOCAL_LENGTH_2: f64 = 1.0;
+    const ASPECT_RATIO_2: f64 = 16.0 / 9.0;
+    const IMG_WIDTH_2: i32 = 600;
+    const IMG_HEIGHT_2: i32 = (IMG_WIDTH_2 as f64 / ASPECT_RATIO_2) as i32;
+    const SAMPLES_PER_PIXEL_2: i32 = 100;
+
+    let camera: Camera<f64> = Camera::new(ASPECT_RATIO_2, VIEWPORT_HEIGHT_2,
+                                          FOCAL_LENGTH_2, ORIGIN_2);
+    // Creating ball
+    let sphere: Sphere<f64> = Sphere::new(Vector3D{x:0.0_f64, y:0.0_f64, z: -1.0_f64}, 0.5_f64);
+    // Creating large ball to emulate ground
+    let ground: Sphere<f64> = Sphere::new(Vector3D{x:0.0_f64, y:-100.5_f64, z: -1.0_f64}, 100.0_f64);
+
+    // Creating scene
+    let mut scene = Scene::default();
+    scene.add(Box::new(sphere));
+    scene.add(Box::new(ground));
+
+
+    // Creating new file
+    let file_name = "antialiasing_gradient_w_gradient_ball_on_ground.ppm";
+    let mut file = std::fs::OpenOptions::new().create(true).write(true).open(file_name)?;
+    // Header info for .ppm file
+    write!(file, "P3\n{} {}\n255\n", IMG_WIDTH, IMG_HEIGHT)?;
+    // Progress bar
+    let bar = indicatif::ProgressBar::new(IMG_HEIGHT as u64);
+    for j in (0..IMG_HEIGHT).rev() {
+        bar.inc(1);
+        for i in 0..IMG_WIDTH {
+            let mut color: RGBColor<f64> = RGBColor{R: 0.0_f64, G: 0.0_f64, B: 0.0_f64};
+            for sample in 0..SAMPLES_PER_PIXEL_2
+            {
+                let u: f64 = (f64::from(i) + utilities_lib::generate_random_number::<f64>(None,None))/ f64::from(IMG_WIDTH-1);
+                let v: f64 = (f64::from(j) + utilities_lib::generate_random_number::<f64>(None,None))/ f64::from(IMG_HEIGHT-1);
+                let ray: Ray3D<f64> = camera.get_ray(u,v);
+                color = color + utilities_lib::ray_color_4(&ray, &mut scene);
+            }
+            utilities_lib::write_color(&file,color)?;
+        }
+    }
+
 
     Ok(())
 }

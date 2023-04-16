@@ -51,7 +51,7 @@ impl<T: DataTypeTraits> Camera<T>
 /// specified pixel on the image plane.
 impl<T: DataTypeTraits> Camera<T>
 {
-    pub fn get_ray(self, u: T, v: T) -> Ray3D<T> {
+    pub fn get_ray(&self, u: T, v: T) -> Ray3D<T> {
         Ray3D {origin: self.origin,
                direction: self.lower_left_corner + self.horizontal * u + self.vertical * v - self.origin}
     }
