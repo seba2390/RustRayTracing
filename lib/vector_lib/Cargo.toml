@@ -14,3 +14,4 @@ path = "lib/Vector.rs"
 [dependencies]
 num-traits = "0.2"
 rand = "0.8.4"
+fastrand = "1.9.0"

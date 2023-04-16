@@ -86,6 +86,29 @@ pub fn ray_color_4<T: DataTypeTraits>(ray: &Ray3D<T>, scene: &mut Scene<T>) -> R
 
 }
 
+#[inline(always)]
+pub fn ray_color_5<T: DataTypeTraits>(ray: &Ray3D<T>, scene: &mut Scene<T>, depth: i32) -> RGBColor<T> {
+    // If we've exceeded the ray bounce limit, no more light is gathered.
+    if depth <= 0 {
+        return RGBColor{R: T::zero(), G: T::zero(), B: T::zero()};
+    }
+
+    let mut hit_record = HitRecord::default();
+    // Setting t_min slightly above 0.0 to get rid of the shadow acne problem
+    if scene.hit(ray, T::from(0.0001).unwrap(), T::from(F32_INFINITY).unwrap(), &mut hit_record) {
+        let p = hit_record.get_point();
+        let target = &p + hit_record.get_normal_vector() + random_in_unit_sphere();
+        // Absorb half the energy on each bounce
+        let absorb_coefficient = T::from(0.5).unwrap();
+        return  ray_color_5(&Ray3D{origin: p, direction: target - p}, scene, depth-1) * absorb_coefficient;
+    }
+    // Unnormalized normal vector of sphere at point of intersection w. ray
+    let unit_direction = ray.direction.unit_vector();
+    let t = T::from(0.5).unwrap() * (unit_direction.y + T::one());
+    return RGBColor{R: T::one(), G:  T::one(), B:  T::one()} * ( T::one() - t) +
+        RGBColor{R: T::from(0.5).unwrap(), G: T::from(0.7).unwrap(), B:  T::one()} * t
+
+}
 
 
 /// Generates a random number of type `T` within the given range. If no range is specified, the random number
@@ -114,27 +137,16 @@ pub fn ray_color_4<T: DataTypeTraits>(ray: &Ray3D<T>, scene: &mut Scene<T>) -> R
 /// let rand_num = generate_random_number::<f64>(None, None);
 /// ```
 #[inline(always)]
-pub fn generate_random_number<T: DataTypeTraits>(min_value: Option<T>, max_value: Option<T>) -> T {
-    let mut rng = fastrand::Rng::new();
+pub fn generate_random_number<T: DataTypeTraits>(min_value: T, max_value: T) -> T {
+    let rng = fastrand::Rng::new();
     if std::mem::size_of::<T>() == std::mem::size_of::<f32>() {
         let random_float = T::from(rng.f32()).unwrap();
-        match (min_value, max_value) {
-            (Some(min), Some(max)) => return min + random_float * (max - min),
-            (Some(min), None) => return min + random_float * (T::max_value() - min),
-            (None, Some(max)) => return random_float * max,
-            (None, None) => return random_float * T::max_value(),
+         return min_value + random_float * (max_value - min_value);
         }
-    }
-    if std::mem::size_of::<T>() == std::mem::size_of::<f64>() {
+    else {
         let random_float = T::from(rng.f64()).unwrap();
-        match (min_value, max_value) {
-            (Some(min), Some(max)) => return min + random_float * (max - min),
-            (Some(min), None) => return min + random_float * (T::max_value() - min),
-            (None, Some(max)) => return random_float * max,
-            (None, None) => return random_float * T::max_value(),
-        }
+        return min_value + random_float * (max_value - min_value);
     }
-    panic!("Invalid 'T' type - expected f32 or f64.");
 }
 
 
@@ -148,12 +160,18 @@ pub fn write_color<T: DataTypeTraits>(mut file: &std::fs::File, color: RGBColor<
     Ok(())
 }
 
-pub fn write_color_2<T: DataTypeTraits>(mut file: &std::fs::File, color: RGBColor<T>, samples_per_pixel: u32) -> std::io::Result<()>
+
+pub fn write_color_2<T: DataTypeTraits>(mut file: &std::fs::File, color_sum: RGBColor<T>, samples_per_pixel: u32) -> std::io::Result<()>
 {
     let factor: f64 = 256.0;
-    let integer_red   = (factor * clamp(color.R.to_f64().unwrap() / samples_per_pixel as f64,0.0, 0.999)) as i32;
-    let integer_green = (factor * clamp(color.G.to_f64().unwrap() / samples_per_pixel as f64,0.0, 0.999)) as i32;
-    let integer_blue  = (factor * clamp(color.B.to_f64().unwrap() / samples_per_pixel as f64,0.0, 0.999)) as i32;
+    // Divide the color by the number of samples and gamma-correct for gamma=2.0 by taking sqrt.
+    let scale: f64 = 1.0 / samples_per_pixel as f64;
+    let r = (scale * color_sum.R.to_f64().unwrap()).sqrt();
+    let g = (scale * color_sum.G.to_f64().unwrap()).sqrt();
+    let b = (scale * color_sum.B.to_f64().unwrap()).sqrt();
+    let integer_red   = (factor * clamp(r,0.0, 0.999)) as i32;
+    let integer_green = (factor * clamp(g,0.0, 0.999)) as i32;
+    let integer_blue  = (factor * clamp(b,0.0, 0.999)) as i32;
     writeln!(file, "{} {} {}", integer_red, integer_green, integer_blue)?;
     Ok(())
 }
@@ -189,6 +207,18 @@ pub fn convert_to_png(file_name: &str) -> Result<(), String> {
 
     Ok(())
 }
+
+
+#[inline(always)]
+pub fn random_in_unit_sphere<T: DataTypeTraits>() -> Vector3D<T>{
+    loop {
+        let random_point = Vector3D::fast_random_uniform(-T::one(), T::one());
+        if random_point.inner_product(&random_point) < T::one() {
+            return random_point;
+        }
+    }
+}
+
 
 #[inline(always)]
 pub fn clamp<T: DataTypeTraits>(x: T, min: T, max: T) -> T

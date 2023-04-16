@@ -186,6 +186,27 @@ impl<T: DataTypeTraits> Vector2D<T>
     }
 }
 
+
+// Implementing Vector2D<T> with random uniform in [low,high[ initialization through <T>::fast_random_uniform()
+impl<T: DataTypeTraits> Vector2D<T>
+{
+    pub fn fast_random_uniform(lower_bound: T, upper_bound: T) -> Vector2D<T> {
+        if upper_bound <= lower_bound {
+            panic!("Upper bound cannot be less than or equal to lower bound");
+        }
+        let rng = fastrand::Rng::new();
+        if std::mem::size_of::<T>() == std::mem::size_of::<f32>() {
+            Vector2D { x: lower_bound + T::from(rng.f32()).unwrap() * (upper_bound - lower_bound),
+                       y: lower_bound + T::from(rng.f32()).unwrap() * (upper_bound - lower_bound)}
+        }
+        else {
+            Vector2D { x: lower_bound + T::from(rng.f64()).unwrap() * (upper_bound - lower_bound),
+                       y: lower_bound + T::from(rng.f64()).unwrap() * (upper_bound - lower_bound)}
+        }
+    }
+}
+
+
 //++++++++++++++++++++++++++++++++++++++++ Addition ++++++++++++++++++++++++++++++++++++++++++++ //
 // Implementing Vector2D<T> + Vector2D<T> -> Vector2D<T> type addition
 impl<T: std::ops::Add<Output = T> + DataTypeTraits> std::ops::Add<Vector2D<T>> for Vector2D<T> {
@@ -450,6 +471,30 @@ impl<T: DataTypeTraits> Vector3D<T>
                    z: distribution.sample(&mut rng)}
     }
 }
+
+// Implementing Vector3D<T> with random uniform in [low,high[ initialization through <T>::fast_random_uniform()
+impl<T: DataTypeTraits> Vector3D<T>
+{
+    pub fn fast_random_uniform(lower_bound: T, upper_bound: T) -> Vector3D<T> {
+        if upper_bound <= lower_bound {
+            panic!("Upper bound cannot be less than or equal to lower bound");
+        }
+        let rng = fastrand::Rng::new();
+        if std::mem::size_of::<T>() == std::mem::size_of::<f32>() {
+            Vector3D { x: lower_bound + T::from(rng.f32()).unwrap() * (upper_bound - lower_bound),
+                       y: lower_bound + T::from(rng.f32()).unwrap() * (upper_bound - lower_bound),
+                       z: lower_bound + T::from(rng.f32()).unwrap() * (upper_bound - lower_bound)}
+        }
+        else {
+            Vector3D { x: lower_bound + T::from(rng.f32()).unwrap() * (upper_bound - lower_bound),
+                       y: lower_bound + T::from(rng.f32()).unwrap() * (upper_bound - lower_bound),
+                       z: lower_bound + T::from(rng.f32()).unwrap() * (upper_bound - lower_bound)}
+        }
+    }
+}
+
+
+
 //++++++++++++++++++++++++++++++++++++++++ Addition ++++++++++++++++++++++++++++++++++++++++++++ //
 // Implementing Vector3D<T> + Vector3D<T> -> Vector3D<T> type addition
 impl<T: std::ops::Add<Output = T> + DataTypeTraits> std::ops::Add<Vector3D<T>> for Vector3D<T> {

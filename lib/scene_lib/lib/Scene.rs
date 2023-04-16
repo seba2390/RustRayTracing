@@ -1,6 +1,4 @@
-use sphere_lib::Sphere;
 
-use vector_lib::Vector3D;
 use vector_lib::DataTypeTraits;
 
 use ray_lib::Ray3D;
