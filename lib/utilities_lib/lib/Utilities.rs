@@ -1,3 +1,5 @@
+use std::io::Write;
+
 use hittable_traits::{HitRecord, Hittable};
 
 use color_lib::RGBColor;
@@ -14,6 +16,8 @@ use scene_lib::Scene;
 
 // Constants
 const F32_INFINITY: f32 = f32::INFINITY;
+const F32_PI: f32 = std::f32::consts::PI;
+
 
 
 /*
@@ -35,7 +39,7 @@ pub fn ray_color<T: DataTypeTraits>(ray: &Ray3D<T>) -> RGBColor<T> {
     let unit_direction: Vector3D<T> = ray.direction.unit_vector();
     let t: T = T::from(0.5).unwrap() * (unit_direction.y +  T::one());
     return RGBColor{R: T::one(), G:  T::one(), B:  T::one()} * ( T::one() - t) +
-           RGBColor{R: T::from(0.5).unwrap(), G: T::from(0.7).unwrap(), B:  T::one()} * t
+        RGBColor{R: T::from(0.5).unwrap(), G: T::from(0.7).unwrap(), B:  T::one()} * t
 }
 
 
@@ -57,7 +61,7 @@ pub fn ray_color_3<T: DataTypeTraits>(ray: &Ray3D<T>, sphere: &Sphere<T>) -> RGB
     {
         // Unnormalized normal vector of sphere at point of intersection w. ray
         #[allow(non_snake_case)]
-        let N: Vector3D<T> = (ray.at(t)-sphere.center).unit_vector();
+            let N: Vector3D<T> = (ray.at(t)-sphere.center).unit_vector();
         RGBColor{R: N.x + T::one(), G: N.y + T::one(),B: N.z + T::one()} * T::from(0.5).unwrap()
     }
     else {
@@ -70,15 +74,15 @@ pub fn ray_color_4<T: DataTypeTraits>(ray: &Ray3D<T>, scene: &mut Scene<T>) -> R
     let mut hit_record = HitRecord::default();
     if scene.hit(ray, T::zero(), T::from(F32_INFINITY).unwrap(), &mut hit_record) {
         #[allow(non_snake_case)]
-        let N = hit_record.get_normal_vector();
+            let N = hit_record.get_normal_vector();
         return (RGBColor{R: N.x, G: N.y, B: N.z} + RGBColor{R: T::one(), G: T::one(), B: T::one()})
-                * T::from(0.5).unwrap()
+            * T::from(0.5).unwrap()
     }
     // Unnormalized normal vector of sphere at point of intersection w. ray
     let unit_direction = ray.direction.unit_vector();
     let t = T::from(0.5).unwrap() * (unit_direction.y + T::one());
     return RGBColor{R: T::one(), G:  T::one(), B:  T::one()} * ( T::one() - t) +
-           RGBColor{R: T::from(0.5).unwrap(), G: T::from(0.7).unwrap(), B:  T::one()} * t
+        RGBColor{R: T::from(0.5).unwrap(), G: T::from(0.7).unwrap(), B:  T::one()} * t
 
 }
 
@@ -110,7 +114,7 @@ pub fn ray_color_4<T: DataTypeTraits>(ray: &Ray3D<T>, scene: &mut Scene<T>) -> R
 /// let rand_num = generate_random_number::<f64>(None, None);
 /// ```
 #[inline(always)]
-fn generate_random_number<T: DataTypeTraits>(min_value: Option<T>, max_value: Option<T>) -> T {
+pub fn generate_random_number<T: DataTypeTraits>(min_value: Option<T>, max_value: Option<T>) -> T {
     let mut rng = fastrand::Rng::new();
     if std::mem::size_of::<T>() == std::mem::size_of::<f32>() {
         let random_float = T::from(rng.f32()).unwrap();
@@ -131,4 +135,48 @@ fn generate_random_number<T: DataTypeTraits>(min_value: Option<T>, max_value: Op
         }
     }
     panic!("Invalid 'T' type - expected f32 or f64.");
+}
+
+
+// Utility functions
+pub fn write_color<T: DataTypeTraits>(mut file: &std::fs::File, color: RGBColor<T>) -> std::io::Result<()>
+{
+    let factor: f64 = 255.999;
+    let integer_red   = (factor * color.R.to_f64().unwrap()) as i32;
+    let integer_green = (factor * color.G.to_f64().unwrap()) as i32;
+    let integer_blue  = (factor * color.B.to_f64().unwrap()) as i32;
+    writeln!(file, "{} {} {}", integer_red, integer_green, integer_blue)?;
+    Ok(())
+}
+
+#[inline(always)]
+pub fn degrees_to_radians<T: DataTypeTraits>(degrees: T) -> T {
+    degrees * T::from(F32_PI).unwrap() / T::from(180.0).unwrap()
+}
+
+
+pub fn convert_to_png(file_name: &str) -> Result<(), String> {
+    let output_file_name = format!("{}.png", &file_name[..file_name.len() - 4]);
+    let command = format!("pnmtopng {} > {}", file_name, output_file_name);
+    let output = std::process::Command::new("sh")
+        .arg("-c")
+        .arg(&command)
+        .output()
+        .map_err(|e| format!("failed to execute process 1: {}", e))?;
+
+    if !output.status.success() {
+        return Err(format!("process exited with code {}", output.status));
+    }
+    let command = format!("rm {}", file_name);
+    let output = std::process::Command::new("sh")
+        .arg("-c")
+        .arg(&command)
+        .output()
+        .map_err(|e| format!("failed to execute process 2: {}", e))?;
+
+    if !output.status.success() {
+        return Err(format!("process exited with code {}", output.status));
+    }
+
+    Ok(())
 }

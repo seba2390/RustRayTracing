@@ -15,54 +15,6 @@ use sphere_lib::Sphere;
 // see: https://raytracing.github.io/books/RayTracingInOneWeekend.html
 
 
-// Constants
-const F32_PI: f32 = std::f32::consts::PI;
-
-
-// Utility functions
-fn write_color<T: DataTypeTraits>(mut file: &std::fs::File, color: RGBColor<T>) -> std::io::Result<()>
-{
-    let factor: f64 = 255.999;
-    let integer_red   = (factor * color.R.to_f64().unwrap()) as i32;
-    let integer_green = (factor * color.G.to_f64().unwrap()) as i32;
-    let integer_blue  = (factor * color.B.to_f64().unwrap()) as i32;
-    writeln!(file, "{} {} {}", integer_red, integer_green, integer_blue)?;
-    Ok(())
-}
-
-#[inline(always)]
-fn degrees_to_radians<T: DataTypeTraits>(degrees: T) -> T {
-    degrees * T::from(F32_PI).unwrap() / T::from(180.0).unwrap()
-}
-
-
-fn convert_to_png(file_name: &str) -> Result<(), String> {
-    let output_file_name = format!("{}.png", &file_name[..file_name.len() - 4]);
-    let command = format!("pnmtopng {} > {}", file_name, output_file_name);
-    let output = std::process::Command::new("sh")
-        .arg("-c")
-        .arg(&command)
-        .output()
-        .map_err(|e| format!("failed to execute process 1: {}", e))?;
-
-    if !output.status.success() {
-        return Err(format!("process exited with code {}", output.status));
-    }
-    let command = format!("rm {}", file_name);
-    let output = std::process::Command::new("sh")
-        .arg("-c")
-        .arg(&command)
-        .output()
-        .map_err(|e| format!("failed to execute process 2: {}", e))?;
-
-    if !output.status.success() {
-        return Err(format!("process exited with code {}", output.status));
-    }
-
-    Ok(())
-}
-
-
 
 fn main() -> std::io::Result<()> {
 
@@ -147,11 +99,11 @@ fn main() -> std::io::Result<()> {
             let ray: Ray3D<f64> = Ray3D{origin: origin.clone(),
                                         direction: &lower_left_corner + &horizontal * u +
                                                    &vertical * v - &origin};
-            let color: RGBColor<f64> = math_lib::ray_color(&ray);
-            write_color(&file,color)?;
+            let color: RGBColor<f64> =utilities_lib::ray_color(&ray);
+            utilities_lib::write_color(&file,color)?;
         }
     }
-    match convert_to_png(file_name) {
+    match utilities_lib::convert_to_png(file_name) {
         Ok(_) => println!("Conversion successful!"),
         Err(e) => eprintln!("Error: {}", e),
     }
@@ -181,11 +133,11 @@ fn main() -> std::io::Result<()> {
             let ray: Ray3D<f64> = Ray3D{origin: origin.clone(),
                 direction: &lower_left_corner + &horizontal * u +
                     &vertical * v - &origin};
-            let color: RGBColor<f64> = math_lib::ray_color_2(&ray, &sphere);
-            write_color(&file,color)?;
+            let color: RGBColor<f64> = utilities_lib::ray_color_2(&ray, &sphere);
+            utilities_lib::write_color(&file,color)?;
         }
     }
-    match convert_to_png(file_name) {
+    match utilities_lib::convert_to_png(file_name) {
         Ok(_) => println!("Conversion successful!"),
         Err(e) => eprintln!("Error: {}", e),
     }
@@ -210,11 +162,11 @@ fn main() -> std::io::Result<()> {
             let ray: Ray3D<f64> = Ray3D{origin: origin.clone(),
                 direction: &lower_left_corner + &horizontal * u +
                     &vertical * v - &origin};
-            let color: RGBColor<f64> = math_lib::ray_color_3(&ray, &sphere);
-            write_color(&file,color)?;
+            let color: RGBColor<f64> = utilities_lib::ray_color_3(&ray, &sphere);
+            utilities_lib::write_color(&file,color)?;
         }
     }
-    match convert_to_png(file_name) {
+    match utilities_lib::convert_to_png(file_name) {
         Ok(_) => println!("Conversion successful!"),
         Err(e) => eprintln!("Error: {}", e),
     }
@@ -248,11 +200,11 @@ fn main() -> std::io::Result<()> {
 
             let ray: Ray3D<f64> = Ray3D{origin: origin.clone(),
                 direction: &lower_left_corner + &horizontal * u + &vertical * v};
-            let color: RGBColor<f64> = math_lib::ray_color_4(&ray, &mut scene);
-            write_color(&file,color)?;
+            let color: RGBColor<f64> = utilities_lib::ray_color_4(&ray, &mut scene);
+            utilities_lib::write_color(&file,color)?;
         }
     }
-    match convert_to_png(file_name) {
+    match utilities_lib::convert_to_png(file_name) {
         Ok(_) => println!("Conversion successful!"),
         Err(e) => eprintln!("Error: {}", e),
     }

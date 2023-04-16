@@ -16,12 +16,12 @@ rand = "0.8.4"
 indicatif = "0.17.3"
 # My libs
 vector_lib = { path = "lib/vector_lib" }
-math_lib = { path = "lib/math_lib" }
 ray_lib = { path = "lib/ray_lib" }
 color_lib = { path = "lib/color_lib" }
 sphere_lib = { path = "lib/sphere_lib" }
 scene_lib = { path = "lib/scene_lib" }
 camera_lib = { path = "lib/camera_lib" }
+utilities_lib = { path = "lib/utilities_lib" }
 
 [[bin]]
 name = "main"
