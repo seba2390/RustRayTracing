@@ -84,7 +84,7 @@ fn main() -> std::io::Result<()> {
 
     //====== Render ======//
     // Creating new file
-    let file_name = "gradient.ppm";
+    let file_name = "renders/gradient.ppm";
     let mut file = std::fs::OpenOptions::new().create(true).write(true).open(file_name)?;
     // Header info for .ppm file
     write!(file, "P3\n{} {}\n255\n", IMG_WIDTH, IMG_HEIGHT)?;
@@ -118,7 +118,7 @@ fn main() -> std::io::Result<()> {
     // Creating ball
     let sphere: Sphere<f64> = Sphere::new(Vector3D{x:0.0_f64, y:0.0_f64, z: -1.0_f64}, 0.5_f64);
     // Creating new file
-    let file_name = "gradient_w_ball.ppm";
+    let file_name = "renders/gradient_w_ball.ppm";
     let mut file = std::fs::OpenOptions::new().create(true).write(true).open(file_name)?;
     // Header info for .ppm file
     write!(file, "P3\n{} {}\n255\n", IMG_WIDTH, IMG_HEIGHT)?;
@@ -147,7 +147,7 @@ fn main() -> std::io::Result<()> {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Creating new file
-    let file_name = "gradient_w_gradient_ball.ppm";
+    let file_name = "renders/gradient_w_gradient_ball.ppm";
     let mut file = std::fs::OpenOptions::new().create(true).write(true).open(file_name)?;
     // Header info for .ppm file
     write!(file, "P3\n{} {}\n255\n", IMG_WIDTH, IMG_HEIGHT)?;
@@ -186,7 +186,7 @@ fn main() -> std::io::Result<()> {
     scene.add(Box::new(ground));
 
     // Creating new file
-    let file_name = "gradient_w_gradient_ball_on_ground.ppm";
+    let file_name = "renders/gradient_w_gradient_ball_on_ground.ppm";
     let mut file = std::fs::OpenOptions::new().create(true).write(true).open(file_name)?;
     // Header info for .ppm file
     write!(file, "P3\n{} {}\n255\n", IMG_WIDTH, IMG_HEIGHT)?;
@@ -237,7 +237,7 @@ fn main() -> std::io::Result<()> {
 
 
     // Creating new file
-    let file_name = "antialiasing_gradient_w_gradient_ball_on_ground.ppm";
+    let file_name = "renders/antialiasing_gradient_w_gradient_ball_on_ground.ppm";
     let mut file = std::fs::OpenOptions::new().create(true).write(true).open(file_name)?;
     // Header info for .ppm file
     write!(file, "P3\n{} {}\n255\n", IMG_WIDTH_2, IMG_HEIGHT_2)?;
@@ -290,7 +290,7 @@ fn main() -> std::io::Result<()> {
 
 
     // Creating new file
-    let file_name = "diffusion_antialiasing_gradient_w_gradient_ball_on_ground.ppm";
+    let file_name = "renders/diffusion_antialiasing_gradient_w_gradient_ball_on_ground.ppm";
     let mut file = std::fs::OpenOptions::new().create(true).write(true).open(file_name)?;
     // Header info for .ppm file
     write!(file, "P3\n{} {}\n255\n", IMG_WIDTH_3, IMG_HEIGHT_3)?;
@@ -346,7 +346,7 @@ fn main() -> std::io::Result<()> {
 
 
     // Creating new file
-    let file_name = "lambertian_diffusion_antialiasing_gradient_w_gradient_ball_on_ground.ppm";
+    let file_name = "renders/lambertian_diffusion_antialiasing_gradient_w_gradient_ball_on_ground.ppm";
     let mut file = std::fs::OpenOptions::new().create(true).write(true).open(file_name)?;
     // Header info for .ppm file
     write!(file, "P3\n{} {}\n255\n", IMG_WIDTH_4, IMG_HEIGHT_4)?;
