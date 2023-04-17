@@ -1,6 +1,6 @@
 use std::io::Write;
 
-use hittable_traits::{HitRecord, Hittable};
+use hittable_material_traits::{HitRecord, Hittable};
 
 use color_lib::RGBColor;
 

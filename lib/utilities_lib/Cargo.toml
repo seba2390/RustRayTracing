@@ -19,4 +19,4 @@ ray_lib = { path = "../ray_lib" }
 color_lib = { path = "../color_lib" }
 sphere_lib = { path = "../sphere_lib" }
 scene_lib = { path = "../scene_lib" }
-hittable_traits = { path = "../hittable_traits" }
+hittable_material_traits = { path = "../hittable_material_traits" }

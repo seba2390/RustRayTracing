@@ -1,15 +1,56 @@
+use std::rc::Rc;
+use std::cell::RefCell;
+
 use ray_lib::Ray3D;
+
 use vector_lib::{Vector3D, VectorOperations};
 use vector_lib::DataTypeTraits;
 
+use color_lib::RGBColor;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////// MATERIAL TRAIT ////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+pub trait Material<T: DataTypeTraits> {
+    fn scatter(
+        &self,
+        ray_in: &Ray3D<T>,
+        rec: &HitRecord<T>,
+        attenuation: &mut RGBColor<T>,
+        scattered: &mut Ray3D<T>,
+    ) -> bool;
+}
+
+
+pub struct NoMaterial;
+impl<T: DataTypeTraits> Material<T> for NoMaterial {
+    fn scatter(
+        &self,
+        _ray_in: &Ray3D<T>,
+        _rec: &HitRecord<T>,
+        _attenuation: &mut RGBColor<T>,
+        _scattered: &mut Ray3D<T>,
+    ) -> bool {
+        false
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////// HITRECORD STRUCT ///////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 // Struct for recording ray collisions
-#[derive(Debug,Copy,Clone)]
+#[derive(Clone)]
 pub struct HitRecord<T: DataTypeTraits> {
     point: Vector3D<T>,
     normal_vector: Vector3D<T>,
     t: T,
-    front_face: bool // True if ray is hitting from outside object, false o.w.
+    front_face: bool, // True if ray is hitting from outside object, false o.w.
+    material: Rc<RefCell<dyn Material<T>>>, // Add material reference
 }
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////// SPECIAL IMPLS ////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -25,14 +66,15 @@ impl<T: DataTypeTraits> HitRecord<T> {
 ///////////////////////////////////// INITIALIZATION IMPL  /////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-// Implementing Vector2D<T> initialization through <T>::new()
 impl<T: DataTypeTraits> Default for HitRecord<T> {
     fn default() -> Self {
-        HitRecord {point: Vector3D::default(),
-                   normal_vector: Vector3D::default(),
-                   t: T::default(),
-                   front_face: bool::default()}
+        HitRecord {
+            point: Vector3D::default(),
+            normal_vector: Vector3D::default(),
+            t: T::default(),
+            front_face: bool::default(),
+            material: Rc::new(RefCell::new(NoMaterial {})), // Add a default material
+        }
     }
 }
 

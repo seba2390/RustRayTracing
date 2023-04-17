@@ -1,4 +1,4 @@
-use hittable_traits::{HitRecord, Hittable};
+use hittable_material_traits::{HitRecord, Hittable};
 
 use vector_lib::Vector3D;
 use vector_lib::VectorOperations;

@@ -16,4 +16,4 @@ num-traits = "0.2"
 rand = "0.8.4"
 vector_lib = { path = "../vector_lib" }
 ray_lib = { path = "../ray_lib" }
-hittable_traits = { path = "../hittable_traits" }
+hittable_material_traits = { path = "../hittable_material_traits" }

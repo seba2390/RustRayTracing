@@ -3,7 +3,7 @@ use vector_lib::DataTypeTraits;
 
 use ray_lib::Ray3D;
 
-use hittable_traits::{HitRecord, Hittable};
+use hittable_material_traits::{HitRecord, Hittable};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////// STRUCT DEFINITION //////////////////////////////////////////
@@ -47,7 +47,7 @@ impl<T: DataTypeTraits> Hittable<T> for Scene<T> {
             if obj.hit(ray, t_min, closest_so_far, & mut hit_record_temp){
                 hit_anything = true;
                 closest_so_far = hit_record_temp.get_t();
-                *hit_record = hit_record_temp;
+                *hit_record = hit_record_temp.clone();
             }
         }
         hit_anything

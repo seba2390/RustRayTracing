@@ -1,5 +1,5 @@
 [package]
-name = "hittable_traits"
+name = "hittable_material_traits"
 version = "0.1.0"
 edition = "2021"
 authors = ["Sebastian Yde Madsen madsen3008@gmail.com"]
@@ -8,11 +8,12 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/seba2390"
 
 [lib]
-name = "hittable_traits"
-path = "lib/Hittable.rs"
+name = "hittable_material_traits"
+path = "lib/HittableMaterial.rs"
 
 [dependencies]
 num-traits = "0.2"
 rand = "0.8.4"
 vector_lib = { path = "../vector_lib" }
 ray_lib = { path = "../ray_lib" }
+color_lib = { path = "../color_lib" }
