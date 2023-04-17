@@ -94,10 +94,43 @@ pub fn ray_color_5<T: DataTypeTraits>(ray: &Ray3D<T>, scene: &mut Scene<T>, dept
     }
 
     let mut hit_record = HitRecord::default();
-    // Setting t_min slightly above 0.0 to get rid of the shadow acne problem
+    // Setting t_min slightly above 0.0 to get rid of the shadow acne problem.
+    // Some of the reflected rays hit the object they are reflecting off of, not at exactly t=0
+    // but instead at t=−0.0000001 or t=0.00000001 or whatever floating point approximation
+    // the intersector gives us. So we need to ignore hits very near zero.
+    //  -> This gets rid of the shadow acne problem.
     if scene.hit(ray, T::from(0.0001).unwrap(), T::from(F32_INFINITY).unwrap(), &mut hit_record) {
         let p = hit_record.get_point();
         let target = &p + hit_record.get_normal_vector() + random_in_unit_sphere();
+        // Absorb half the energy on each bounce
+        let absorb_coefficient = T::from(0.5).unwrap();
+        return  ray_color_5(&Ray3D{origin: p, direction: target - p}, scene, depth-1) * absorb_coefficient;
+    }
+    // Unnormalized normal vector of sphere at point of intersection w. ray
+    let unit_direction = ray.direction.unit_vector();
+    let t = T::from(0.5).unwrap() * (unit_direction.y + T::one());
+    return RGBColor{R: T::one(), G:  T::one(), B:  T::one()} * ( T::one() - t) +
+        RGBColor{R: T::from(0.5).unwrap(), G: T::from(0.7).unwrap(), B:  T::one()} * t
+
+}
+
+#[inline(always)]
+// True Lambertian reflection
+pub fn ray_color_6<T: DataTypeTraits>(ray: &Ray3D<T>, scene: &mut Scene<T>, depth: i32) -> RGBColor<T> {
+    // If we've exceeded the ray bounce limit, no more light is gathered.
+    if depth <= 0 {
+        return RGBColor{R: T::zero(), G: T::zero(), B: T::zero()};
+    }
+
+    let mut hit_record = HitRecord::default();
+    // Setting t_min slightly above 0.0 to get rid of the shadow acne problem.
+    // Some of the reflected rays hit the object they are reflecting off of, not at exactly t=0
+    // but instead at t=−0.0000001 or t=0.00000001 or whatever floating point approximation
+    // the intersector gives us. So we need to ignore hits very near zero.
+    //  -> This gets rid of the shadow acne problem.
+    if scene.hit(ray, T::from(0.0001).unwrap(), T::from(F32_INFINITY).unwrap(), &mut hit_record) {
+        let p = hit_record.get_point();
+        let target = &p + hit_record.get_normal_vector() + random_unit_vector();
         // Absorb half the energy on each bounce
         let absorb_coefficient = T::from(0.5).unwrap();
         return  ray_color_5(&Ray3D{origin: p, direction: target - p}, scene, depth-1) * absorb_coefficient;
@@ -218,6 +251,10 @@ pub fn random_in_unit_sphere<T: DataTypeTraits>() -> Vector3D<T>{
         }
     }
 }
+
+#[inline(always)]
+// To achieve true Lambertian reflection
+pub fn random_unit_vector<T: DataTypeTraits>() -> Vector3D<T>{ return random_in_unit_sphere().unit_vector();}
 
 
 #[inline(always)]
