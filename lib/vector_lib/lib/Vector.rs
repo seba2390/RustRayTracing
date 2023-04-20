@@ -11,7 +11,7 @@ pub trait DataTypeTraits:
         num_traits::Float + std::fmt::Display + std::fmt::Debug +
         std::marker::Copy + std::default::Default + num_traits::Zero +
         num_traits::One + rand::distributions::uniform::SampleUniform +
-        std::clone::Clone{
+        std::clone::Clone + num_traits::float::FloatConst + std::marker::Send{
         // we'd usually add more functions in this block,
         // but in this case we don't need any more.
 }
@@ -21,7 +21,7 @@ impl<T> DataTypeTraits for T
     where T: num_traits::Float + std::fmt::Display + std::fmt::Debug +
     std::marker::Copy + std::default::Default + num_traits::Zero +
     num_traits::One + rand::distributions::uniform::SampleUniform +
-    std::clone::Clone{
+    std::clone::Clone + num_traits::float::FloatConst + std::marker::Send{
     // Nothing to implement, since T already supports the other traits.
     // It has the functions it needs already
 }
@@ -699,7 +699,7 @@ impl<T: DataTypeTraits> VectorOperations<T> for Vector3D<T> {
 // Implementing Vector3D<T>.cross_product(Vector3D<T>)
 impl<T: std::ops::Mul<Output = T> + DataTypeTraits> Vector3D<T>{
     #[inline(always)]
-    fn cross_product(self, other: Self) -> Vector3D<T> {
+    fn cross_product(&self, other: &Self) -> Vector3D<T> {
         Self { x: self.y * other.z - self.z * other.y,
                y: self.z * other.x - self.x * other.z,
                z: self.x * other.y - self.y * other.x}

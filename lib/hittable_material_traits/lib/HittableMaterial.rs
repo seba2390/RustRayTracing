@@ -1,6 +1,3 @@
-use std::rc::Rc;
-use std::cell::RefCell;
-
 use ray_lib::Ray3D;
 
 use vector_lib::{Vector3D, VectorOperations};
@@ -47,7 +44,6 @@ pub struct HitRecord<T: DataTypeTraits> {
     normal_vector: Vector3D<T>,
     t: T,
     front_face: bool, // True if ray is hitting from outside object, false o.w.
-    material: Rc<RefCell<dyn Material<T>>>, // Add material reference
 }
 
 
@@ -73,7 +69,6 @@ impl<T: DataTypeTraits> Default for HitRecord<T> {
             normal_vector: Vector3D::default(),
             t: T::default(),
             front_face: bool::default(),
-            material: Rc::new(RefCell::new(NoMaterial {})), // Add a default material
         }
     }
 }

@@ -1,4 +1,4 @@
-use hittable_material_traits::{HitRecord, Hittable};
+use hittable_material_traits::{HitRecord, Hittable, Material};
 
 use vector_lib::Vector3D;
 use vector_lib::VectorOperations;
@@ -6,7 +6,7 @@ use vector_lib::DataTypeTraits;
 
 use ray_lib::Ray3D;
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub struct Sphere<T: DataTypeTraits>
 {
     pub center: Vector3D<T>,
@@ -18,8 +18,10 @@ pub struct Sphere<T: DataTypeTraits>
 impl<T: DataTypeTraits> Sphere<T>
 {
     pub fn new(center: Vector3D<T>, radius: T) -> Self {
-        // Doing to this to avoid having to specify hit_record when initializing
-        Sphere {center, radius}
+        Sphere {
+            center: center,
+            radius: radius,
+        }
     }
 }
 
