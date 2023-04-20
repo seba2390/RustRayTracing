@@ -38,16 +38,17 @@ fn main() -> std::io::Result<()> {
 
     let camera: Camera<f64> = Camera::new(ASPECT_RATIO_4, VIEWPORT_HEIGHT_4,
                                           FOCAL_LENGTH_4, ORIGIN_4);
-    // Creating ball
-    let center = Vector3D{x:0.0_f64, y:0.0_f64, z: -1.0_f64};
-    let radius = 0.5_f64;
-    let sphere: Sphere<f64> = Sphere::new(center, radius);
+    // Creating balls
+    let center_1 = Vector3D{x:0.0_f64, y:0.0_f64, z: -1.0_f64};
+    let radius_1 = 0.5_f64;
+    let sphere_1: Sphere<f64> = Sphere::new(center_1, radius_1);
+
     // Creating large ball to emulate ground
     let ground: Sphere<f64> = Sphere::new(Vector3D{x:0.0_f64, y:-100.5_f64, z: -1.0_f64}, 100.0_f64);
 
     // Creating scene
     let mut scene = Scene::default();
-    scene.add(Box::new(sphere));
+    scene.add(Box::new(sphere_1));
     scene.add(Box::new(ground));
 
 

@@ -41,6 +41,7 @@ pub fn ray_color<T: DataTypeTraits>(ray: &Ray3D<T>, scene: &mut Scene<T>, depth:
     if scene.hit(ray, T::from(0.0001).unwrap(), T::from(F32_INFINITY).unwrap(), &mut hit_record) {
         let p = hit_record.get_point();
         //let method: &str = "Acceptance-Rejection";
+        //let method: &str = "Native";
         let method: &str = "Inverse-CDF";
         //let method: &str = "Gaussian-Sampling";
         let target = &p + hit_record.get_normal_vector() + random_uniform_unit_sphere_point(method);
@@ -95,6 +96,7 @@ pub fn generate_random_uniform<T: DataTypeTraits>(min_value: T, max_value: T) ->
     }
 }
 
+
 #[inline(always)]
 pub fn generate_random_gaussian<T: DataTypeTraits>(mean: T, std_dev: T) -> T {
     if std::mem::size_of::<T>() == std::mem::size_of::<f32>() {
@@ -106,6 +108,8 @@ pub fn generate_random_gaussian<T: DataTypeTraits>(mean: T, std_dev: T) -> T {
         return T::from(normal_dist.sample(&mut rand::thread_rng())).unwrap();
     }
 }
+
+
 
 
 pub fn write_color<T: DataTypeTraits>(mut file: &std::fs::File, color_sum: RGBColor<T>, samples_per_pixel: u32) -> std::io::Result<()>
@@ -192,6 +196,10 @@ pub fn random_uniform_unit_sphere_point<T: DataTypeTraits>(method: &str) -> Vect
                                   y: y,
                                   z: z }.unit_vector();
         }
+    else if method == "Native" {
+        let v: [T; 3] = rand_distr::UnitSphere.sample(&mut rand::thread_rng());
+        return Vector3D::<T>{x: v[0],y: v[1],z: v[2]}
+    }
     else {
         panic!("Unsupported method.")
     }
