@@ -25,41 +25,6 @@ impl<T: DataTypeTraits> Sphere<T>
     }
 }
 
-impl<T: DataTypeTraits> Sphere<T> {
-
-    #[inline(always)]
-    pub fn is_hit(&self, ray: &Ray3D<T>) -> bool
-    {
-        let oc: Vector3D<T> = ray.origin - self.center;
-        let a: T = ray.direction.inner_product(&ray.direction);
-        let b: T = T::from(2.0).unwrap() * oc.inner_product(&ray.direction);
-        let c = oc.inner_product(&oc) - self.radius*self.radius;
-        let discriminant = b*b - T::from(4.0).unwrap()*a*c;
-        discriminant > T::zero()
-    }
-}
-
-// Notice optimized discriminant calculation as opposed to is_hit
-impl<T: DataTypeTraits> Sphere<T>
-{
-    #[inline(always)]
-    pub fn is_hit_at(&self, ray: &Ray3D<T>) -> T
-    {
-        let oc: Vector3D<T> = ray.origin - self.center;
-        let a: T = ray.direction.inner_product(&ray.direction);
-        let half_b: T = oc.inner_product(&ray.direction);
-        let c = oc.inner_product(&oc) - self.radius*self.radius;
-        let discriminant = half_b*half_b - a*c;
-        if discriminant < T::zero()
-        {
-            -T::one()
-        }
-        else {
-            (-half_b - discriminant.sqrt()) / a // Only one of the solutions
-        }
-    }
-}
-
 
 impl<T: DataTypeTraits> Hittable<T> for Sphere<T> {
     fn hit(&mut self, ray: &Ray3D<T>, t_min: T, t_max: T, hit_record: &mut HitRecord<T>) -> bool
